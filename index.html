@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estoque de Supermercado</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .hidden {
+            display: none;
+        }
+        #resultadoBusca {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Controle de Estoque de Supermercado</h1>
+    
+    <input type="text" id="buscaProduto" placeholder="Digite o nome do produto">
+    <button id="buscarProduto">Buscar</button>
+    <div id="resultadoBusca" class="hidden"></div>
+
+    <button id="atualizarEstoque">Atualizar Estoque</button>
+
+    <script>
+        const url = 'estoque.json'; // URL para o arquivo JSON
+        let estoqueGlobal = [];
+
+        async function carregarEstoque() {
+            try {
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('Erro ao carregar o estoque');
+                
+                estoqueGlobal = await response.json();
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        document.getElementById('atualizarEstoque').addEventListener('click', carregarEstoque);
+
+        document.getElementById('buscarProduto').addEventListener('click', () => {
+            const nomeProduto = document.getElementById('buscaProduto').value.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+            const resultadoBusca = document.getElementById('resultadoBusca');
+
+            if (nomeProduto === '') {
+                resultadoBusca.innerHTML = "<p>Por favor, insira um nome de produto.</p>";
+                resultadoBusca.classList.remove('hidden');
+                return;
+            }
+
+            const produtoEncontrado = estoqueGlobal.find(item => 
+                item.produto.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').includes(nomeProduto) || 
+                item.sinonimos.some(sinonimo => sinonimo.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').includes(nomeProduto))
+            );
+
+            if (produtoEncontrado) {
+                resultadoBusca.innerHTML = `<h2>${produtoEncontrado.produto}</h2>
+                                            <p>Quantidade: ${produtoEncontrado.quantidade}</p>
+                                            <p>Preço: R$ ${produtoEncontrado.preco.toFixed(2)}</p>
+                                            <img src="${produtoEncontrado.imagem}" alt="${produtoEncontrado.produto}" style="width: 200px; height: auto;">`;
+                resultadoBusca.classList.remove('hidden');
+            } else {
+                resultadoBusca.innerHTML = "<p>Produto não encontrado.</p>";
+                resultadoBusca.classList.remove('hidden');
+            }
+        });
+
+        cargarEstoque(); // Carrega o estoque inicialmente
+    </script>
+</body>
+</html>
