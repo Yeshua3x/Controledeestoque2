@@ -34,4 +34,12 @@
         "sinonimos": ["óleo de soja", "óleo de girassol"],
         "imagem": "url_da_imagem_do_oleo.jpg"
     }
+{
+        "produto": "Farinha",
+        "quantidade": 30,
+        "preco": 8.00,
+        "sinonimos": [" de soja", "óleo de girassol"],
+        "imagem": "url_da_imagem_do_oleo.jpg"
+    }
+
 ]
